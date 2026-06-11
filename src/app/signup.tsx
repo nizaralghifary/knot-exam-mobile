@@ -7,13 +7,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
@@ -29,11 +22,6 @@ export default function SignUp() {
   const [agree, setAgree] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
-  const [otpModal, setOtpModal] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [otpLoading, setOtpLoading] = useState(false);
-  const [resendLoading, setResendLoading] = useState(false);
 
   async function requestJson(path: string, body: Record<string, unknown>) {
     const response = await fetch(apiUrl(path), {
@@ -63,52 +51,12 @@ export default function SignUp() {
 
     try {
       await requestJson("/auth/signup", { username, email, password });
-
-      await requestJson("/auth/request", { email });
-
-      setOtpModal(true);
+      router.push(`/verify?email=${encodeURIComponent(email)}`);
     } catch (err: any) {
       setErrorMessage(err.message || "Something went wrong while creating your account.");
       console.error(err.message);
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function handleVerifyOTP() {
-    if (otp.length !== 6) return;
-
-    setErrorMessage("");
-
-    setOtpLoading(true);
-
-    try {
-      await requestJson("/auth/verify", { email, otp });
-
-      setOtpModal(false);
-      router.push("/");
-    } catch (err: any) {
-      setErrorMessage(err.message || "Invalid OTP");
-      console.error(err.message);
-    } finally {
-      setOtpLoading(false);
-    }
-  }
-
-  async function handleResendOTP() {
-    setErrorMessage("");
-
-    setResendLoading(true);
-
-    try {
-      await requestJson("/auth/request", { email });
-
-      setOtp("");
-    } catch (err: any) {
-      setErrorMessage(err.message || "Failed to resend OTP");
-      console.error(err.message);
-    } finally {
-      setResendLoading(false);
     }
   }
 
@@ -118,7 +66,7 @@ export default function SignUp() {
         contentContainerClassName="flex-1 justify-center px-6 py-12"
         keyboardShouldPersistTaps="handled"
       >
-        <Card className="w-full rounded-3xl border-border bg-card shadow-sm shadow-black/5">
+        <Card className="w-full rounded-3xl border-border bg-card shadow-sm">
           <CardHeader>
             <CardTitle>Sign Up</CardTitle>
             <CardDescription>Create your account</CardDescription>
@@ -144,44 +92,45 @@ export default function SignUp() {
               className="rounded-2xl"
             />
 
-            <View className="flex-row items-center border border-input rounded-2xl overflow-hidden">
+            <View className="relative overflow-hidden rounded-2xl border border-input">
               <Input
                 value={password}
                 onChangeText={setPassword}
                 placeholder="Password"
                 secureTextEntry={!showPassword}
                 editable={!loading}
-                className="flex-1 border-0 rounded-none"
+                className="border-0 rounded-none pr-12"
               />
               <Pressable
-                onPress={() => setShowPassword((v) => !v)}
+                onPress={() => setShowPassword((current) => !current)}
                 disabled={loading}
-                className="px-3"
+                className="absolute right-0 top-0 h-full items-center justify-center px-3"
               >
-                {showPassword
-                  ? <EyeOff size={18} className="text-muted-foreground" />
-                  : <Eye size={18} className="text-muted-foreground" />
-                }
+                {showPassword ? (
+                  <EyeOff size={18} className="text-muted-foreground" />
+                ) : (
+                  <Eye size={18} className="text-muted-foreground" />
+                )}
               </Pressable>
             </View>
 
             <View className="flex-row items-center gap-3 mt-1">
               <Checkbox
                 checked={agree}
-                onCheckedChange={(v) => setAgree(!!v)}
+                onCheckedChange={(value) => setAgree(!!value)}
               />
               <Label className="flex-1 text-muted-foreground font-normal leading-relaxed">
                 I agree to the{" "}
                 <Text
                   className="text-foreground underline"
-                  onPress={() => router.push("/")}
+                  onPress={() => router.push("https://knot.nizar.my.id/terms")}
                 >
                   Terms of Service
                 </Text>
                 {" "}and{" "}
                 <Text
                   className="text-foreground underline"
-                  onPress={() => router.push("/")}
+                  onPress={() => router.push("https://knot.nizar.my.id/privacy")}
                 >
                   Privacy Policy
                 </Text>
@@ -189,9 +138,7 @@ export default function SignUp() {
             </View>
 
             {errorMessage ? (
-              <Text className="text-sm text-destructive">
-                {errorMessage}
-              </Text>
+              <Text className="text-sm text-destructive">{errorMessage}</Text>
             ) : null}
 
             <Button
@@ -213,61 +160,6 @@ export default function SignUp() {
           </CardContent>
         </Card>
       </ScrollView>
-
-      <Dialog open={otpModal} onOpenChange={setOtpModal}>
-        <DialogContent className="gap-5">
-          <DialogHeader>
-            <DialogTitle>Verify your email</DialogTitle>
-            <DialogDescription>
-              Enter the 6-digit code sent to {email}
-            </DialogDescription>
-          </DialogHeader>
-
-          <Input
-            value={otp}
-            onChangeText={(v) => {
-              setOtp(v);
-              if (v.length === 6) handleVerifyOTP();
-            }}
-            placeholder="000000"
-            keyboardType="number-pad"
-            maxLength={6}
-            className="rounded-2xl text-center text-xl tracking-widest font-mono"
-            editable={!otpLoading}
-          />
-
-          <Button
-            onPress={handleVerifyOTP}
-            disabled={otpLoading || otp.length !== 6}
-            className="h-12 rounded-2xl"
-          >
-            <Text className="text-primary-foreground font-medium">
-              {otpLoading ? "Verifying..." : "Verify OTP"}
-            </Text>
-          </Button>
-
-          <View className="items-center gap-2">
-            <Text className="text-sm text-muted-foreground">
-              Didn't receive the code?
-            </Text>
-            <Button
-              variant="outline"
-              size="sm"
-              onPress={handleResendOTP}
-              disabled={resendLoading || otpLoading}
-              className="rounded-2xl"
-            >
-              <Text className="text-sm">
-                {resendLoading ? "Sending..." : "Resend OTP"}
-              </Text>
-            </Button>
-          </View>
-
-          <Text className="text-xs text-muted-foreground text-center">
-            Check your spam folder if you don't see the email
-          </Text>
-        </DialogContent>
-      </Dialog>
     </SafeAreaView>
   );
 }

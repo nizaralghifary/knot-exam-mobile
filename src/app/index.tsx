@@ -3,14 +3,14 @@ import { ArrowRight, BookOpen, GraduationCap } from "lucide-react-native";
 import { useEffect } from "react";
 import { Pressable, View } from "react-native";
 import Animated, {
-    Easing,
-    Extrapolation,
-    interpolate,
-    useAnimatedStyle,
-    useSharedValue,
-    withDelay,
-    withRepeat,
-    withTiming,
+  Easing,
+  Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withRepeat,
+  withTiming,
 } from 'react-native-reanimated';
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -134,7 +134,7 @@ export default function HomeScreen() {
         <Animated.View style={cardStyle} className="gap-3 pb-2">
           {roles.map(({ key, title, description, Icon }) => (
             <Pressable key={key} onPress={handleRole}>
-              <Card className="rounded-3xl border-border bg-card shadow-sm shadow-black/5">
+              <Card className="rounded-3xl border-border bg-card shadow-sm">
                 <CardHeader className="flex-row items-center gap-4 pb-0">
                   <View className="h-12 w-12 items-center justify-center rounded-2xl bg-muted">
                     <Icon size={22} className="text-foreground" />
