@@ -4,12 +4,12 @@
     "slug": "Knot",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/KnotExam_Logo.png",
     "scheme": "knot",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.anonymous.Knot"
+      "icon": "./assets/images/KnotExam_Logo.png",
+      "bundleIdentifier": "com.nizar.KnotExam"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,11 +19,11 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.Knot"
+      "package": "com.nizar.KnotExam"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png",
+      "favicon": "./assets/images/KnotExam_Logo.png",
       "bundler": "metro"
     },
     "plugins": [
@@ -33,7 +33,7 @@
         {
           "backgroundColor": "#208AEF",
           "android": {
-            "image": "./assets/images/splash-icon.png",
+            "image": "./assets/images/KnotExam_Logo.png",
             "imageWidth": 76
           }
         }
